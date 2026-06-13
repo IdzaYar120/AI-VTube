@@ -1,0 +1,283 @@
+/*
+  ======================================================
+  Open-LLM-VTuber Custom Premium Redesign (Chakra UI v3)
+  ======================================================
+  Theme: Neon Cyberpunk Glassmorphism
+  Colors: Deep Obsidian, Electric Purple, Cyan Neon Accents
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global Reset and Body Background */
+body, html, #root {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  background: url('/bg/cozy_anime_study.png') no-repeat center center fixed !important;
+  background-size: cover !important;
+  color: #f1f1f4 !important;
+  overflow: hidden !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Semi-transparent Dark Tint Overlay on Body */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(15, 10, 25, 0.4), rgba(5, 5, 10, 0.85)) !important;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Force Layout Container Transparency */
+#root,
+#root > div,
+#root > div > div:nth-child(1),
+#live2d-internal-wrapper,
+#root [role="tabpanel"] {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 93, 229, 0.25) !important;
+  border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 93, 229, 0.5) !important;
+}
+
+/* Standard Typography Color Corrections */
+p, span, h1, h2, h3, h4, h5, h6, label, legend {
+  color: #e2e2e9 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Chakra UI Buttons Styling */
+.chakra-button {
+  background: linear-gradient(135deg, rgba(155, 93, 229, 0.15), rgba(92, 61, 181, 0.15)) !important;
+  border: 1px solid rgba(155, 93, 229, 0.35) !important;
+  color: #d6b4fc !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.chakra-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(155, 93, 229, 0.3), rgba(92, 61, 181, 0.3)) !important;
+  border-color: rgba(155, 93, 229, 0.7) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(155, 93, 229, 0.55), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-1px) scale(1.02) !important;
+  cursor: pointer !important;
+}
+
+.chakra-button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+.chakra-button:disabled {
+  opacity: 0.4 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Attaching / Utility Icon Buttons */
+.chakra-button[aria-label="Attach file"],
+.chakra-button[aria-label="Mode Menu"],
+.chakra-button[aria-label="Settings"],
+.chakra-button[class*="chakra-drawer__trigger"] {
+  border-radius: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Chat Input Textarea Styling */
+.chakra-textarea {
+  background: rgba(12, 12, 18, 0.6) !important;
+  border: 1px solid rgba(155, 93, 229, 0.35) !important;
+  color: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.95em !important;
+  line-height: 1.5 !important;
+  min-height: 50px !important;
+  resize: none !important;
+}
+
+.chakra-textarea:hover {
+  border-color: rgba(155, 93, 229, 0.55) !important;
+}
+
+.chakra-textarea:focus {
+  border-color: rgba(155, 93, 229, 0.8) !important;
+  box-shadow: 0 0 18px rgba(155, 93, 229, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  background: rgba(10, 10, 15, 0.75) !important;
+  outline: none !important;
+}
+
+.chakra-textarea::placeholder {
+  color: rgba(165, 165, 181, 0.5) !important;
+}
+
+/* Tabs Navigation Styling */
+.chakra-tabs__trigger, 
+[role="tab"] {
+  background: rgba(20, 20, 30, 0.45) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 10px !important;
+  padding: 10px 18px !important;
+  font-weight: 500 !important;
+  transition: all 0.25s ease !important;
+  margin: 0 4px !important;
+}
+
+.chakra-tabs__trigger:hover:not([data-selected]), 
+[role="tab"]:hover:not([aria-selected="true"]) {
+  background: rgba(155, 93, 229, 0.15) !important;
+  color: #ffffff !important;
+  border-color: rgba(155, 93, 229, 0.3) !important;
+}
+
+.chakra-tabs__trigger[data-selected], 
+.chakra-tabs__trigger[aria-selected="true"],
+[role="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, rgba(155, 93, 229, 0.35), rgba(92, 61, 181, 0.25)) !important;
+  color: #ffffff !important;
+  border-color: rgba(155, 93, 229, 0.65) !important;
+  box-shadow: 0 0 15px rgba(155, 93, 229, 0.3) !important;
+  font-weight: 600 !important;
+}
+
+/* Drawers, Dialogs, Menus & Modals Glassmorphism */
+.chakra-drawer__content,
+.chakra-dialog__content,
+.chakra-menu__content,
+[role="dialog"],
+[role="menu"] {
+  background: rgba(15, 15, 22, 0.82) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(155, 93, 229, 0.3) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 16px !important;
+  color: #f1f1f4 !important;
+}
+
+/* Sidebar and Main Content Panels */
+/* Left Column (Character Viewport) - Transparent, no blur, background is sharp */
+#root > div > div:nth-child(1),
+#live2d-internal-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#live2d-internal-wrapper canvas {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Right Column (Chat, Inputs, and Settings) - Frosted Glass Panel */
+#root > div > div:nth-child(2) {
+  background: rgba(12, 12, 18, 0.78) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-left: 1px solid rgba(155, 93, 229, 0.25) !important;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Ensure controls remain interactive on top of the panels */
+.chakra-textarea,
+.chakra-button,
+[aria-label="Attach file"],
+[aria-label="Mode Menu"],
+[aria-label="Settings"],
+[class*="chakra-drawer__trigger"],
+[class*="chakra-menu__trigger"] {
+  position: relative !important;
+  z-index: 15 !important;
+}
+
+/* Chat Message Bubbles Styling */
+/* We style elements containing message text */
+div[class*="css-"] p {
+  line-height: 1.6 !important;
+}
+
+/* Assistant (Incoming) Message Bubbles: Frosted Purple Glass */
+/* Typically aligned to the left of the parent stack */
+div[class*="css-"] {
+  /* Add animations for messages appearing */
+}
+
+/* Since Chakra UI uses random hash CSS names, we can hook into alignment or structure to styled bubbles */
+/* Let's style child divs of the chat stack */
+/* All message bubbles have padding, border-radius, shadow */
+.chakra-stack > div {
+  transition: all 0.3s ease;
+}
+
+/* Custom UI Polish: Glowing active nodes */
+.connected-glow {
+  text-shadow: 0 0 10px #00ffcc, 0 0 20px rgba(0, 255, 204, 0.5) !important;
+  color: #00ffcc !important;
+  font-weight: 700 !important;
+}
+
+/* Target "Connected" and status texts */
+div:has(> span):contains("Connected"), 
+span:contains("Connected"),
+div:contains("Connected") {
+  text-shadow: 0 0 10px #00ffcc, 0 0 20px rgba(0, 255, 204, 0.5) !important;
+  color: #00ffcc !important;
+  font-weight: bold !important;
+}
+
+/* Adding custom scroll behaviors and overall premium neon styling details */
+body {
+  animation: bgPulse 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}

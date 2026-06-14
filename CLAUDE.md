@@ -28,17 +28,17 @@ Open-LLM-VTuber is a voice-interactive AI companion with Live2D avatar support t
 
 ### Core Components
 
-**WebSocket Server** (`src/open_llm_vtuber/server.py`):
+**WebSocket Server** (`src/ai_vtuber/server.py`):
 - FastAPI-based server handling WebSocket connections
 - Serves frontend, Live2D models, and static assets
 - Supports both main client and proxy WebSocket endpoints
 
-**Service Context** (`src/open_llm_vtuber/service_context.py`):
+**Service Context** (`src/ai_vtuber/service_context.py`):
 - Central dependency injection container
 - Manages all engines (LLM, ASR, TTS, VAD, etc.)
 - Each WebSocket connection gets its own service context instance
 
-**WebSocket Handler** (`src/open_llm_vtuber/websocket_handler.py`):
+**WebSocket Handler** (`src/ai_vtuber/websocket_handler.py`):
 - Routes WebSocket messages to appropriate handlers
 - Manages client connections, groups, and conversation state
 - Handles audio data, conversation triggers, and Live2D interactions
@@ -47,33 +47,33 @@ Open-LLM-VTuber is a voice-interactive AI companion with Live2D avatar support t
 
 The project uses a factory pattern for all AI engines:
 
-**Agent System** (`src/open_llm_vtuber/agent/`):
+**Agent System** (`src/ai_vtuber/agent/`):
 - `agent_factory.py` - Factory for creating different agent types
 - `agents/` - Various agent implementations (basic_memory, hume_ai, letta, mem0)
 - `stateless_llm/` - Stateless LLM implementations (Claude, OpenAI, Ollama, etc.)
 
-**ASR Engines** (`src/open_llm_vtuber/asr/`):
+**ASR Engines** (`src/ai_vtuber/asr/`):
 - Support for multiple ASR backends: Sherpa-ONNX, FunASR, Faster-Whisper, OpenAI Whisper, etc.
 - Factory pattern for engine selection based on configuration
 
-**TTS Engines** (`src/open_llm_vtuber/tts/`):
+**TTS Engines** (`src/ai_vtuber/tts/`):
 - Multiple TTS options: Azure TTS, Edge TTS, MeloTTS, CosyVoice, GPT-SoVITS, etc.
 - Configurable voice cloning and multi-language support
 
-**VAD (Voice Activity Detection)** (`src/open_llm_vtuber/vad/`):
+**VAD (Voice Activity Detection)** (`src/ai_vtuber/vad/`):
 - Silero VAD for detecting speech activity
 - Essential for voice interruption without feedback loops
 
 ### Configuration Management
 
-**Config System** (`src/open_llm_vtuber/config_manager/`):
+**Config System** (`src/ai_vtuber/config_manager/`):
 - Type-safe configuration classes for each component
 - Automatic validation and loading from YAML files
 - Support for multiple character configurations and config switching
 
 ### Conversation System
 
-**Conversation Handling** (`src/open_llm_vtuber/conversations/`):
+**Conversation Handling** (`src/ai_vtuber/conversations/`):
 - `conversation_handler.py` - Main conversation orchestration
 - `single_conversation.py` - Individual user conversations
 - `group_conversation.py` - Multi-user group conversations
@@ -81,7 +81,7 @@ The project uses a factory pattern for all AI engines:
 
 ### MCP (Model Context Protocol) Integration
 
-**MCP System** (`src/open_llm_vtuber/mcpp/`):
+**MCP System** (`src/ai_vtuber/mcpp/`):
 - Tool execution and server registry
 - JSON detection and parameter extraction
 - Integration with various MCP servers for extended functionality
@@ -109,8 +109,8 @@ The codebase uses the missing `_cleanup_failed_connection` method pattern - when
 ## Important File Locations
 
 - **Entry point**: `run_server.py`
-- **Main server**: `src/open_llm_vtuber/server.py`
-- **WebSocket routing**: `src/open_llm_vtuber/routes.py`
+- **Main server**: `src/ai_vtuber/server.py`
+- **WebSocket routing**: `src/ai_vtuber/routes.py`
 - **Configuration**: `conf.yaml` (user), `config_templates/` (defaults)
 - **Frontend**: `frontend/` (Git submodule)
 - **Live2D models**: `live2d-models/`

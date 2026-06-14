@@ -1,4 +1,4 @@
-# src/open_llm_vtuber/tts/openai_tts.py
+# src/ai_vtuber/tts/openai_tts.py
 import os
 import sys
 from pathlib import Path

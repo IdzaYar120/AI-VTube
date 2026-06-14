@@ -1,7 +1,7 @@
 """
-Open-LLM-VTuber Server
+AI VTuber Server
 ========================
-This module contains the WebSocket server for Open-LLM-VTuber, which handles
+This module contains the WebSocket server for AI VTuber, which handles
 the WebSocket connections, serves static files, and manages the web tool.
 It uses FastAPI for the server and Starlette for static file serving.
 """
@@ -57,7 +57,7 @@ class AvatarStaticFiles(CORSStaticFiles):
 
 class WebSocketServer:
     """
-    API server for Open-LLM-VTuber. This contains the websocket endpoint for the client, hosts the web tool, and serves static files.
+    API server for AI VTuber. This contains the websocket endpoint for the client, hosts the web tool, and serves static files.
 
     Creates and configures a FastAPI app, registers all routes
     (WebSocket, web tools, proxy) and mounts static assets with CORS.
@@ -74,7 +74,7 @@ class WebSocketServer:
     """
 
     def __init__(self, config: Config, default_context_cache: ServiceContext = None):
-        self.app = FastAPI(title="Open-LLM-VTuber Server")  # Added title for clarity
+        self.app = FastAPI(title="AI VTuber Server")  # Added title for clarity
         self.config = config
         self.default_context_cache = (
             default_context_cache or ServiceContext()

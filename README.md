@@ -1,6 +1,6 @@
-# Open-LLM-VTuber
+# AI VTuber
 
-**Open-LLM-VTuber** is a voice-interactive AI companion that supports real-time voice conversations and visual perception, featuring a Live2D avatar. The application can run completely offline on your computer.
+**AI VTuber** is a voice-interactive AI companion that supports real-time voice conversations and visual perception, featuring a Live2D avatar. The application can run completely offline on your computer.
 
 ## Features
 

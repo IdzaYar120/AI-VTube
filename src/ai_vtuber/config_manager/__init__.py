@@ -1,5 +1,5 @@
 """
-Configuration management package for Open LLM VTuber.
+Configuration management package for AI VTuber.
 
 This package provides configuration management functionality through Pydantic models
 and utility functions for loading/saving configurations.

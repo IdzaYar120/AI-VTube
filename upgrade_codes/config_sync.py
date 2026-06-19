@@ -1,5 +1,6 @@
 import os
 import shutil
+# pyrefly: ignore [missing-import]
 from upgrade_codes.upgrade_core.constants import (
     USER_CONF,
     BACKUP_CONF,

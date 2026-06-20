@@ -108,19 +108,36 @@ def init_webtool_routes(default_context_cache: ServiceContext) -> APIRouter:
         for entry in os.scandir(live2d_dir):
             if entry.is_dir():
                 folder_name = entry.name.replace("\\", "/")
-                model3_file = os.path.join(
-                    live2d_dir, folder_name, f"{folder_name}.model3.json"
-                ).replace("\\", "/")
+                
+                # Recursively search for any .model3.json file inside the character folder
+                model3_file = None
+                for root, dirs, files in os.walk(os.path.join(live2d_dir, folder_name)):
+                    for file in files:
+                        if file.endswith(".model3.json"):
+                            model3_file = os.path.join(root, file).replace("\\", "/")
+                            break
+                    if model3_file:
+                        break
 
-                if os.path.isfile(model3_file):
+                if model3_file:
                     # Find avatar file if it exists
                     avatar_file = None
                     for ext in supported_extensions:
+                        # Check in the root of the character folder first
                         avatar_path = os.path.join(
                             live2d_dir, folder_name, f"{folder_name}{ext}"
-                        )
+                        ).replace("\\", "/")
                         if os.path.isfile(avatar_path):
-                            avatar_file = avatar_path.replace("\\", "/")
+                            avatar_file = avatar_path
+                            break
+                        
+                        # Also check next to the .model3.json file
+                        model3_dir = os.path.dirname(model3_file)
+                        avatar_path_alt = os.path.join(
+                            model3_dir, f"{folder_name}{ext}"
+                        ).replace("\\", "/")
+                        if os.path.isfile(avatar_path_alt):
+                            avatar_file = avatar_path_alt
                             break
 
                     valid_characters.append(

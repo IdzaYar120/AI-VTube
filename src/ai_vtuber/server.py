@@ -110,9 +110,12 @@ class WebSocketServer:
                 init_proxy_route(server_url=server_url),
             )
 
+        # Ensure all mounted static directories exist to prevent startup crashes
+        for folder in ["cache", "live2d-models", "backgrounds", "avatars"]:
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
         # Mount cache directory first (to ensure audio file access)
-        if not os.path.exists("cache"):
-            os.makedirs("cache")
         self.app.mount(
             "/cache",
             CORSStaticFiles(directory="cache"),

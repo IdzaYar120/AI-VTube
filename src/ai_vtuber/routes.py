@@ -155,6 +155,17 @@ def init_webtool_routes(default_context_cache: ServiceContext) -> APIRouter:
             }
         )
 
+    @router.get("/backgrounds/info")
+    async def get_backgrounds_info():
+        """Get list of available background images"""
+        from .config_manager.utils import scan_bg_directory
+        try:
+            bgs = scan_bg_directory()
+            return JSONResponse({"backgrounds": bgs})
+        except Exception as e:
+            logger.error(f"Error scanning backgrounds: {e}")
+            return JSONResponse({"error": str(e)}, status_code=500)
+
     @router.post("/asr")
     async def transcribe_audio(file: UploadFile = File(...)):
         """

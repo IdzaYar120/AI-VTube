@@ -11,7 +11,7 @@
 /* Global Reset and Body Background */
 body, html, #root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  background: url('/bg/cozy_anime_study.png') no-repeat center center fixed !important;
+  background: var(--bg-image, url('/bg/cozy_anime_study.png')) no-repeat center center fixed !important;
   background-size: cover !important;
   color: #f1f1f4 !important;
   overflow: hidden !important;
@@ -280,4 +280,15 @@ body {
   100% {
     background-position: 100% 50%;
   }
+}
+
+/* Chat-Hidden Layout Toggles */
+body.chat-hidden #root > div > div:nth-child(2) {
+  display: none !important;
+}
+
+body.chat-hidden #root > div > div:nth-child(1) {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  flex: 1 1 100% !important;
 }

@@ -21,7 +21,11 @@ from .chat_history_manager import (
     delete_history,
     get_history_list,
 )
-from .config_manager.utils import scan_config_alts_directory, scan_bg_directory
+from .config_manager.utils import (
+    scan_config_alts_directory,
+    scan_bg_directory,
+    validate_config,
+)
 from .conversations.conversation_handler import (
     handle_conversation_trigger,
     handle_group_interrupt,
@@ -95,6 +99,8 @@ class WebSocketHandler:
             "audio-play-start": self._handle_audio_play_start,
             "request-init-config": self._handle_init_config_request,
             "heartbeat": self._handle_heartbeat,
+            "update-setting": self._handle_update_setting,
+            "fetch-current-settings": self._handle_fetch_current_settings,
         }
 
     async def handle_new_connection(
@@ -610,3 +616,144 @@ class WebSocketHandler:
             await websocket.send_json({"type": "heartbeat-ack"})
         except Exception as e:
             logger.error(f"Error sending heartbeat acknowledgment: {e}")
+
+    async def _handle_update_setting(
+        self, websocket: WebSocket, client_uid: str, data: dict
+    ) -> None:
+        """Handle updating a specific configuration setting dynamically"""
+        key = data.get("key")
+        value = data.get("value")
+        if not key:
+            return
+
+        try:
+            context = self.client_contexts[client_uid]
+            config_dict = context.config.model_dump()
+
+            updated = False
+            if key == "character_name":
+                config_dict["character_config"]["character_name"] = str(value)
+                updated = True
+            elif key == "persona_prompt":
+                config_dict["character_config"]["persona_prompt"] = str(value)
+                updated = True
+            elif key == "tts_model":
+                config_dict["character_config"]["tts_config"]["tts_model"] = str(value)
+                updated = True
+            elif key == "edge_tts_voice":
+                if (
+                    "edge_tts" not in config_dict["character_config"]["tts_config"]
+                    or config_dict["character_config"]["tts_config"]["edge_tts"] is None
+                ):
+                    config_dict["character_config"]["tts_config"]["edge_tts"] = {
+                        "voice": "en-US-AvaMultilingualNeural"
+                    }
+                config_dict["character_config"]["tts_config"]["edge_tts"]["voice"] = (
+                    str(value)
+                )
+                updated = True
+            elif key == "llm_provider":
+                config_dict["character_config"]["agent_config"]["agent_settings"][
+                    "basic_memory_agent"
+                ]["llm_provider"] = str(value)
+                updated = True
+            elif key == "llm_model":
+                provider = config_dict["character_config"]["agent_config"][
+                    "agent_settings"
+                ]["basic_memory_agent"]["llm_provider"]
+                if (
+                    provider
+                    in config_dict["character_config"]["agent_config"]["llm_configs"]
+                ):
+                    if (
+                        config_dict["character_config"]["agent_config"]["llm_configs"][
+                            provider
+                        ]
+                        is None
+                    ):
+                        config_dict["character_config"]["agent_config"]["llm_configs"][
+                            provider
+                        ] = {}
+                    config_dict["character_config"]["agent_config"]["llm_configs"][
+                        provider
+                    ]["model"] = str(value)
+                    updated = True
+
+            if updated:
+                new_config = validate_config(config_dict)
+                await context.load_from_config(new_config)
+
+                # Send success response
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "settings-updated",
+                            "key": key,
+                            "value": value,
+                            "message": f"Successfully updated '{key}' to '{value}'",
+                        }
+                    )
+                )
+
+                # Broadcast new state
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "set-model-and-conf",
+                            "model_info": context.live2d_model.model_info,
+                            "conf_name": context.character_config.conf_name,
+                            "conf_uid": context.character_config.conf_uid,
+                        }
+                    )
+                )
+                logger.info(f"Setting '{key}' dynamically updated to: {value}")
+            else:
+                logger.warning(f"Unsupported setting key for dynamic update: {key}")
+
+        except Exception as e:
+            logger.error(f"Error updating setting '{key}': {e}")
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "message": f"Failed to update setting '{key}': {str(e)}",
+                    }
+                )
+            )
+
+    async def _handle_fetch_current_settings(
+        self, websocket: WebSocket, client_uid: str, data: dict
+    ) -> None:
+        """Handle request for current service context settings"""
+        try:
+            context = self.client_contexts[client_uid]
+            char_cfg = context.character_config
+
+            llm_provider = (
+                char_cfg.agent_config.agent_settings.basic_memory_agent.llm_provider
+            )
+            llm_model = ""
+            llm_configs = char_cfg.agent_config.llm_configs
+            active_llm_config = getattr(llm_configs, llm_provider, None)
+            if active_llm_config and hasattr(active_llm_config, "model"):
+                llm_model = active_llm_config.model
+
+            edge_tts_voice = ""
+            if char_cfg.tts_config.edge_tts:
+                edge_tts_voice = char_cfg.tts_config.edge_tts.voice
+
+            settings = {
+                "character_name": char_cfg.character_name,
+                "persona_prompt": char_cfg.persona_prompt,
+                "tts_model": char_cfg.tts_config.tts_model,
+                "edge_tts_voice": edge_tts_voice,
+                "llm_provider": llm_provider,
+                "llm_model": llm_model,
+            }
+
+            await websocket.send_text(
+                json.dumps({"type": "current-settings", "settings": settings})
+            )
+            logger.info("Sent current settings to client")
+        except Exception as e:
+            logger.error(f"Error fetching current settings: {e}")

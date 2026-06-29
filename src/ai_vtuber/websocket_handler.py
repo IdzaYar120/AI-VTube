@@ -101,6 +101,7 @@ class WebSocketHandler:
             "heartbeat": self._handle_heartbeat,
             "update-setting": self._handle_update_setting,
             "fetch-current-settings": self._handle_fetch_current_settings,
+            "trigger-expression": self._handle_trigger_expression,
         }
 
     async def handle_new_connection(
@@ -749,6 +750,7 @@ class WebSocketHandler:
                 "edge_tts_voice": edge_tts_voice,
                 "llm_provider": llm_provider,
                 "llm_model": llm_model,
+                "emo_map": context.live2d_model.emo_map if context.live2d_model else {},
             }
 
             await websocket.send_text(
@@ -757,3 +759,22 @@ class WebSocketHandler:
             logger.info("Sent current settings to client")
         except Exception as e:
             logger.error(f"Error fetching current settings: {e}")
+
+    async def _handle_trigger_expression(
+        self, websocket: WebSocket, client_uid: str, data: dict
+    ) -> None:
+        """Handle manual request to trigger a Live2D expression"""
+        expression_val = data.get("expression")
+        if expression_val is not None:
+            try:
+                payload = {
+                    "type": "audio",
+                    "audio": None,
+                    "volumes": [],
+                    "slice_length": 20,
+                    "actions": {"expressions": [expression_val]},
+                }
+                await websocket.send_text(json.dumps(payload))
+                logger.info(f"Triggered expression value: {expression_val}")
+            except Exception as e:
+                logger.error(f"Error triggering expression: {e}")

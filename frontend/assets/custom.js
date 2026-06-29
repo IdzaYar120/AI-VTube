@@ -189,6 +189,12 @@ async function initPremiumControls() {
         </div>
       </div>
 
+      <!-- Section: Live2D Expressions -->
+      <div class="settings-section">
+        <label class="settings-label">Live2D Expressions</label>
+        <div id="expression-buttons-grid" class="expression-grid"></div>
+      </div>
+
       <!-- Section: System Prompt (Persona) -->
       <div class="settings-section flex-fill">
         <label class="settings-label">System Persona Prompt</label>
@@ -323,6 +329,31 @@ async function initPremiumControls() {
     personaTextarea.value = settings.persona_prompt || '';
     if (settings.edge_tts_voice) {
       voiceSelect.value = settings.edge_tts_voice;
+    }
+
+    // Populate Live2D expressions grid
+    const exprGrid = document.getElementById('expression-buttons-grid');
+    exprGrid.innerHTML = '';
+    if (settings.emo_map && Object.keys(settings.emo_map).length > 0) {
+      Object.keys(settings.emo_map).forEach(emoName => {
+        const emoValue = settings.emo_map[emoName];
+        const btn = document.createElement('button');
+        btn.className = 'drawer-action-btn expression-btn';
+        btn.textContent = emoName.charAt(0).toUpperCase() + emoName.slice(1);
+        btn.title = `Trigger ${emoName} (value: ${emoValue})`;
+        btn.addEventListener('click', () => {
+          if (window.activeWS && window.activeWS.readyState === OriginalWebSocket.OPEN) {
+            window.activeWS.send(JSON.stringify({
+              type: 'trigger-expression',
+              expression: emoValue
+            }));
+            showNotification(`Triggered ${emoName} expression`, 'success');
+          }
+        });
+        exprGrid.appendChild(btn);
+      });
+    } else {
+      exprGrid.innerHTML = '<span style="font-size: 12px; color: #a5a5b5; font-style: italic;">No expressions mapped for this model</span>';
     }
   });
 

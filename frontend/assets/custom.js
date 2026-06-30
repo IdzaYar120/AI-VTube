@@ -181,6 +181,23 @@ async function initPremiumControls() {
         </div>
       </div>
 
+      <!-- Section: Voice Cloning Upload -->
+      <div class="settings-section">
+        <label class="settings-label">Voice Cloning (Upload Reference Audio)</label>
+        <div class="voice-upload-zone" id="voice-upload-dropzone">
+          <div class="upload-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <span class="upload-text" id="voice-upload-text">Drag & drop WAV/MP3 here or click</span>
+          <input type="file" id="voice-clone-file" accept=".wav,.mp3,.ogg,.m4a" style="display: none;">
+        </div>
+        <div class="voice-clone-status" id="voice-clone-status-msg" style="display: none;"></div>
+      </div>
+
       <!-- Section: Virtual Background -->
       <div class="settings-section">
         <label class="settings-label">Virtual Background</label>
@@ -217,6 +234,88 @@ async function initPremiumControls() {
   const saveBtn = document.getElementById('save-settings-btn');
   const clearBtn = document.getElementById('clear-history-btn');
   const closeDrawerBtn = document.getElementById('close-drawer-btn');
+
+  // Voice Cloning Upload handlers
+  const fileInput = document.getElementById('voice-clone-file');
+  const dropzone = document.getElementById('voice-upload-dropzone');
+  const uploadText = document.getElementById('voice-upload-text');
+  const statusMsg = document.getElementById('voice-clone-status-msg');
+
+  dropzone.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('dragover');
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleVoiceUpload(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files && fileInput.files[0]) {
+      handleVoiceUpload(fileInput.files[0]);
+    }
+  });
+
+  async function handleVoiceUpload(file) {
+    const validExtensions = ['.wav', '.mp3', '.ogg', '.m4a'];
+    const fileExt = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExtensions.includes(fileExt)) {
+      showNotification('Unsupported file format. Please upload a WAV, MP3, OGG, or M4A file.', 'error');
+      return;
+    }
+
+    uploadText.textContent = 'Uploading voice sample...';
+    dropzone.classList.add('uploading');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/upload-voice-clone', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const result = await response.json();
+      if (result.status === 'success' && result.file_path) {
+        showNotification('Voice clone uploaded successfully!', 'success');
+        
+        if (window.activeWS && window.activeWS.readyState === OriginalWebSocket.OPEN) {
+          window.activeWS.send(JSON.stringify({
+            type: 'update-setting',
+            key: 'voice_clone_path',
+            value: result.file_path
+          }));
+          
+          statusMsg.style.display = 'block';
+          statusMsg.innerHTML = `Active reference: <span class="voice-ref-name" title="${result.file_path}">${result.filename}</span>`;
+        }
+      }
+    } catch (err) {
+      console.error('Voice clone upload failed', err);
+      showNotification(`Upload failed: ${err.message}`, 'error');
+    } finally {
+      uploadText.textContent = 'Drag & drop WAV/MP3 here or click';
+      dropzone.classList.remove('uploading');
+    }
+  }
 
   // Create Main Control Panel (Top-Right Floating Bar)
   const controlsContainer = document.createElement('div');
@@ -329,6 +428,16 @@ async function initPremiumControls() {
     personaTextarea.value = settings.persona_prompt || '';
     if (settings.edge_tts_voice) {
       voiceSelect.value = settings.edge_tts_voice;
+    }
+
+    // Populate voice clone active path
+    const statusMsgElement = document.getElementById('voice-clone-status-msg');
+    if (settings.voice_clone_path) {
+      statusMsgElement.style.display = 'block';
+      const fileBaseName = settings.voice_clone_path.split('/').pop().split('\\').pop();
+      statusMsgElement.innerHTML = `Active reference: <span class="voice-ref-name" title="${settings.voice_clone_path}">${fileBaseName}</span>`;
+    } else {
+      statusMsgElement.style.display = 'none';
     }
 
     // Populate Live2D expressions grid

@@ -588,3 +588,82 @@ body.chat-hidden #root > div > div:nth-child(1) {
 .expression-btn:active {
   transform: translateY(1px);
 }
+
+/* Voice Cloning Uploader Styling */
+.voice-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(155, 93, 229, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+}
+
+.voice-upload-zone:hover {
+  background: rgba(155, 93, 229, 0.05);
+  border-color: rgba(155, 93, 229, 0.6);
+  box-shadow: 0 0 12px rgba(155, 93, 229, 0.2);
+}
+
+.voice-upload-zone.dragover {
+  background: rgba(155, 93, 229, 0.1);
+  border-color: #9b5de5;
+  box-shadow: 0 0 20px rgba(155, 93, 229, 0.4);
+}
+
+.voice-upload-zone.uploading {
+  border-style: solid;
+  border-color: #06d6a0;
+  animation: pulse-border 1.5s infinite;
+  cursor: not-allowed;
+}
+
+.upload-icon {
+  color: rgba(155, 93, 229, 0.6);
+  margin-bottom: 8px;
+  transition: color 0.3s ease;
+}
+
+.voice-upload-zone:hover .upload-icon {
+  color: #d6b4fc;
+}
+
+.upload-text {
+  font-size: 11px;
+  color: #a5a5b5;
+  text-align: center;
+  pointer-events: none;
+}
+
+.voice-clone-status {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #06d6a0;
+  background: rgba(6, 214, 160, 0.1);
+  border: 1px solid rgba(6, 214, 160, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+.voice-ref-name {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(6, 214, 160, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(6, 214, 160, 0);
+  }
+}

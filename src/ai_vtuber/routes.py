@@ -108,7 +108,7 @@ def init_webtool_routes(default_context_cache: ServiceContext) -> APIRouter:
         for entry in os.scandir(live2d_dir):
             if entry.is_dir():
                 folder_name = entry.name.replace("\\", "/")
-                
+
                 # Recursively search for any .model3.json file inside the character folder
                 model3_file = None
                 for root, dirs, files in os.walk(os.path.join(live2d_dir, folder_name)):
@@ -130,7 +130,7 @@ def init_webtool_routes(default_context_cache: ServiceContext) -> APIRouter:
                         if os.path.isfile(avatar_path):
                             avatar_file = avatar_path
                             break
-                        
+
                         # Also check next to the .model3.json file
                         model3_dir = os.path.dirname(model3_file)
                         avatar_path_alt = os.path.join(
@@ -159,12 +159,55 @@ def init_webtool_routes(default_context_cache: ServiceContext) -> APIRouter:
     async def get_backgrounds_info():
         """Get list of available background images"""
         from .config_manager.utils import scan_bg_directory
+
         try:
             bgs = scan_bg_directory()
             return JSONResponse({"backgrounds": bgs})
         except Exception as e:
             logger.error(f"Error scanning backgrounds: {e}")
             return JSONResponse({"error": str(e)}, status_code=500)
+
+    @router.post("/upload-voice-clone")
+    async def upload_voice_clone(file: UploadFile = File(...)):
+        """
+        Upload an audio file for voice cloning.
+        Saves the file to 'uploads/voice_clones/' and returns the absolute path.
+        """
+        logger.info(f"Received voice clone upload: {file.filename}")
+        try:
+            upload_dir = os.path.join("uploads", "voice_clones")
+            os.makedirs(upload_dir, exist_ok=True)
+
+            file_ext = os.path.splitext(file.filename)[1]
+            if not file_ext:
+                file_ext = ".wav"
+
+            if file_ext.lower() not in [".wav", ".mp3", ".ogg", ".m4a"]:
+                return JSONResponse(
+                    {
+                        "error": "Unsupported file format. Please upload .wav, .mp3, .ogg, or .m4a"
+                    },
+                    status_code=400,
+                )
+
+            unique_filename = f"voice_clone_{uuid4().hex}{file_ext}"
+            file_path = os.path.abspath(
+                os.path.join(upload_dir, unique_filename)
+            ).replace("\\", "/")
+
+            contents = await file.read()
+            with open(file_path, "wb") as f:
+                f.write(contents)
+
+            logger.info(f"Successfully saved voice clone audio to: {file_path}")
+            return JSONResponse(
+                {"status": "success", "file_path": file_path, "filename": file.filename}
+            )
+        except Exception as e:
+            logger.error(f"Failed to process voice clone upload: {e}")
+            return JSONResponse(
+                {"error": f"Failed to save voice clone file: {str(e)}"}, status_code=500
+            )
 
     @router.post("/asr")
     async def transcribe_audio(file: UploadFile = File(...)):

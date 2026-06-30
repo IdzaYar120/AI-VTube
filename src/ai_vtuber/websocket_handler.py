@@ -653,6 +653,107 @@ class WebSocketHandler:
                     str(value)
                 )
                 updated = True
+            elif key == "voice_clone_path":
+                tts_model = config_dict["character_config"]["tts_config"].get(
+                    "tts_model"
+                )
+                if tts_model == "gpt_sovits":
+                    if (
+                        "gpt_sovits"
+                        not in config_dict["character_config"]["tts_config"]
+                        or config_dict["character_config"]["tts_config"]["gpt_sovits"]
+                        is None
+                    ):
+                        config_dict["character_config"]["tts_config"]["gpt_sovits"] = {
+                            "api_url": "http://127.0.0.1:9880/tts",
+                            "text_lang": "zh",
+                            "ref_audio_path": "",
+                            "prompt_lang": "zh",
+                            "prompt_text": "",
+                            "text_split_method": "cut5",
+                            "batch_size": "1",
+                            "media_type": "wav",
+                            "streaming_mode": "ture",
+                        }
+                    config_dict["character_config"]["tts_config"]["gpt_sovits"][
+                        "ref_audio_path"
+                    ] = str(value)
+                    updated = True
+                elif tts_model == "cosyvoice":
+                    if (
+                        "cosyvoice" not in config_dict["character_config"]["tts_config"]
+                        or config_dict["character_config"]["tts_config"]["cosyvoice"]
+                        is None
+                    ):
+                        config_dict["character_config"]["tts_config"]["cosyvoice"] = {
+                            "client_url": "http://127.0.0.1:50000/",
+                            "mode_checkbox_group": "预训练音色",
+                            "sft_dropdown": "中文女",
+                            "prompt_text": "",
+                            "prompt_wav_upload_url": "",
+                            "prompt_wav_record_url": "",
+                            "instruct_text": "",
+                            "seed": 0,
+                            "api_name": "/generate_audio",
+                        }
+                    config_dict["character_config"]["tts_config"]["cosyvoice"][
+                        "prompt_wav_upload_url"
+                    ] = str(value)
+                    updated = True
+                elif tts_model == "cosyvoice2":
+                    if (
+                        "cosyvoice2"
+                        not in config_dict["character_config"]["tts_config"]
+                        or config_dict["character_config"]["tts_config"]["cosyvoice2"]
+                        is None
+                    ):
+                        config_dict["character_config"]["tts_config"]["cosyvoice2"] = {
+                            "client_url": "http://127.0.0.1:50000/",
+                            "mode_checkbox_group": "预训练音色",
+                            "sft_dropdown": "中文女",
+                            "prompt_text": "",
+                            "prompt_wav_upload_url": "",
+                            "prompt_wav_record_url": "",
+                            "instruct_text": "",
+                            "stream": False,
+                            "seed": 0,
+                            "speed": 1.0,
+                            "api_name": "/generate_audio",
+                        }
+                    config_dict["character_config"]["tts_config"]["cosyvoice2"][
+                        "prompt_wav_upload_url"
+                    ] = str(value)
+                    updated = True
+                elif tts_model == "xtts":
+                    if (
+                        "xtts" not in config_dict["character_config"]["tts_config"]
+                        or config_dict["character_config"]["tts_config"]["xtts"] is None
+                    ):
+                        config_dict["character_config"]["tts_config"]["xtts"] = {
+                            "api_url": "http://127.0.0.1:8020/tts",
+                            "speaker_wav": "",
+                            "language": "en",
+                        }
+                    config_dict["character_config"]["tts_config"]["xtts"][
+                        "speaker_wav"
+                    ] = str(value)
+                    updated = True
+                elif tts_model == "coqui_tts":
+                    if (
+                        "coqui_tts" not in config_dict["character_config"]["tts_config"]
+                        or config_dict["character_config"]["tts_config"]["coqui_tts"]
+                        is None
+                    ):
+                        config_dict["character_config"]["tts_config"]["coqui_tts"] = {
+                            "model_name": "",
+                            "speaker_wav": "",
+                            "language": "en",
+                            "device": "",
+                        }
+                    config_dict["character_config"]["tts_config"]["coqui_tts"][
+                        "speaker_wav"
+                    ] = str(value)
+                    updated = True
             elif key == "llm_provider":
                 config_dict["character_config"]["agent_config"]["agent_settings"][
                     "basic_memory_agent"
@@ -743,6 +844,19 @@ class WebSocketHandler:
             if char_cfg.tts_config.edge_tts:
                 edge_tts_voice = char_cfg.tts_config.edge_tts.voice
 
+            voice_clone_path = ""
+            tts_model_name = char_cfg.tts_config.tts_model
+            if tts_model_name == "gpt_sovits" and char_cfg.tts_config.gpt_sovits:
+                voice_clone_path = char_cfg.tts_config.gpt_sovits.ref_audio_path
+            elif tts_model_name == "cosyvoice" and char_cfg.tts_config.cosyvoice:
+                voice_clone_path = char_cfg.tts_config.cosyvoice.prompt_wav_upload_url
+            elif tts_model_name == "cosyvoice2" and char_cfg.tts_config.cosyvoice2:
+                voice_clone_path = char_cfg.tts_config.cosyvoice2.prompt_wav_upload_url
+            elif tts_model_name == "xtts" and char_cfg.tts_config.xtts:
+                voice_clone_path = char_cfg.tts_config.xtts.speaker_wav
+            elif tts_model_name == "coqui_tts" and char_cfg.tts_config.coqui_tts:
+                voice_clone_path = char_cfg.tts_config.coqui_tts.speaker_wav
+
             settings = {
                 "character_name": char_cfg.character_name,
                 "persona_prompt": char_cfg.persona_prompt,
@@ -751,6 +865,7 @@ class WebSocketHandler:
                 "llm_provider": llm_provider,
                 "llm_model": llm_model,
                 "emo_map": context.live2d_model.emo_map if context.live2d_model else {},
+                "voice_clone_path": voice_clone_path,
             }
 
             await websocket.send_text(
